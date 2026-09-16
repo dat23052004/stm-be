@@ -1,0 +1,11 @@
+**/bin
+**/obj
+.git
+.vs
+.idea
+.env*
+**/appsettings.Local.json
+artifacts
+TestResults
+*.user
+.nuget

@@ -1,0 +1,45 @@
+name: build-test
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+      - name: Verify locked restore, NuGet audit, formatting, build and tests
+        shell: pwsh
+        run: ./scripts/verify.ps1
+      - name: Smoke test HTTP foundation
+        shell: pwsh
+        run: ./scripts/smoke-test.ps1
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # v0.2.6
+        with:
+          version: v0.74.0
+          cache: false
+      - name: Build runtime image
+        run: docker build -t backend-api:ci .
+      - name: Smoke test runtime image
+        shell: pwsh
+        run: ./scripts/smoke-test.ps1 -Image backend-api:ci
+      - name: Scan repository, secrets and runtime image
+        shell: pwsh
+        run: ./scripts/security-check.ps1 -Image backend-api:ci
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verification-results
+          path: artifacts/
+          if-no-files-found: warn

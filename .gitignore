@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+*.user
+*.suo
+.env
+.env.*
+**/appsettings.Local.json
+**/TestResults/
+artifacts/
+.nuget/
+*.log
+*.trx
+coverage/
