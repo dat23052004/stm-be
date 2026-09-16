@@ -43,3 +43,65 @@ jobs:
           name: verification-results
           path: artifacts/
           if-no-files-found: warn
+
+  publish-image:
+    name: Publish image to GHCR
+    needs: build-test
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_ref: ${{ steps.image.outputs.image_ref }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Log in to GitHub Container Registry
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: echo "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+      - name: Build and publish immutable and branch tags
+        id: image
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}
+        run: |
+          image_ref="${IMAGE_NAME}:${GITHUB_SHA}"
+          branch_ref="${IMAGE_NAME}:${GITHUB_REF_NAME}"
+          docker build --pull \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --tag "$image_ref" \
+            --tag "$branch_ref" \
+            .
+          docker push "$image_ref"
+          docker push "$branch_ref"
+          echo "image_ref=$image_ref" >> "$GITHUB_OUTPUT"
+
+  deploy-staging:
+    name: Deploy staging
+    needs: publish-image
+    if: >-
+      needs.publish-image.result == 'success' &&
+      github.ref == 'refs/heads/develop' &&
+      vars.STAGING_DEPLOY_ENABLED == 'true'
+    uses: ./.github/workflows/deploy-linux.yml
+    with:
+      environment_name: staging
+      image_ref: ${{ needs.publish-image.outputs.image_ref }}
+    secrets: inherit
+
+  deploy-production:
+    name: Deploy production
+    needs: publish-image
+    if: >-
+      needs.publish-image.result == 'success' &&
+      github.ref == 'refs/heads/main' &&
+      vars.PRODUCTION_DEPLOY_ENABLED == 'true'
+    uses: ./.github/workflows/deploy-linux.yml
+    with:
+      environment_name: production
+      image_ref: ${{ needs.publish-image.outputs.image_ref }}
+    secrets: inherit

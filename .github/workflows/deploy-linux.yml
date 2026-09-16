@@ -1,0 +1,66 @@
+name: deploy-linux
+
+on:
+  workflow_call:
+    inputs:
+      environment_name:
+        description: GitHub Environment and Linux deployment slot
+        required: true
+        type: string
+      image_ref:
+        description: Immutable GHCR image reference
+        required: true
+        type: string
+      sync_only:
+        description: Upload deployment files without changing containers
+        required: false
+        default: false
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      environment_name:
+        description: Environment to deploy or roll back
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      image_ref:
+        description: GHCR image reference, preferably a commit SHA tag or digest
+        required: false
+        default: ghcr.io/dat23052004/stm-be:main
+        type: string
+      sync_only:
+        description: Only upload deployment files for first-time server setup
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: linux-labx
+      cancel-in-progress: false
+    environment:
+      name: ${{ inputs.environment_name }}
+      url: https://${{ vars.APP_DOMAIN }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Deploy immutable image over SSH
+        shell: bash
+        env:
+          DEPLOY_SLOT: ${{ inputs.environment_name }}
+          IMAGE_REF: ${{ inputs.image_ref }}
+          SYNC_ONLY: ${{ inputs.sync_only }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: bash ./scripts/deploy-linux-runner.sh

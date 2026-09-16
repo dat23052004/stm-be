@@ -18,7 +18,12 @@ Các flow minh họa và test case đã được gỡ để repository trở v�
 - Api -> Application/Infrastructure; Application -> Domain; Infrastructure -> Application/Domain.
 - Controllers cho feature HTTP; root và health là endpoint kỹ thuật.
 - Tên solution giữ nhận diện sản phẩm là `LabX_Be.sln`; project, namespace và class dùng tên không có tiền tố tên sản phẩm.
-- Chưa khởi tạo Git hoặc remote. CI/Dependabot được cấu hình để dùng khi có hosting.
+- Git repository dùng branch `main` và remote GitHub
+  [`dat23052004/stm-be`](https://github.com/dat23052004/stm-be). Workflow `build-test` và Dependabot đang hoạt động.
+- Dependabot không đề xuất nâng major các Docker image .NET để giữ target .NET 9; các cập nhật khác vẫn phải được
+  review và chạy CI trước khi merge.
+- Image đã qua CI được publish lên GitHub Container Registry theo commit SHA. CD Linux dùng một VPS, Docker
+  Compose, Caddy và hai slot staging/production; tự động deploy vẫn tắt cho tới khi điền server, domain và secrets.
 - Có lockfiles, locked restore, NuGet audit toàn bộ dependency, format check và script Trivy.
 - ProblemDetails cho lỗi; trace ID ở response/header; CORS lấy từ config; OpenAPI chỉ Development.
 - Ba project xUnit đã được cấu hình cho unit, integration và architecture test nhưng hiện chưa có test case/fixture.
@@ -33,7 +38,7 @@ Các flow minh họa và test case đã được gỡ để repository trở v�
 - Database provider, schema, migration và dữ liệu seed.
 - Identity provider, JWT/cookie, roles/permissions và các route cần bảo vệ.
 - External services, storage, email, cache, background jobs theo nhu cầu thực tế.
-- Frontend origins, hosting, TLS/reverse proxy và môi trường triển khai.
+- Giá trị thật cho Linux host, domain/DNS, frontend origins, SSH credentials và GitHub Environment protections.
 - Đánh giá phiên bản .NET/package và chính sách hỗ trợ trước giai đoạn triển khai.
 
 Các mục trên chưa được triển khai; không coi folder hoặc template là tính năng đã hoàn thành.

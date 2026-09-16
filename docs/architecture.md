@@ -43,6 +43,7 @@ LabX/
 ├── .codex/agents/           Cấu hình các custom subagent
 ├── .github/                 GitHub Actions, Dependabot và mẫu pull request
 ├── docs/                    Kiến trúc, context, ADR, hướng dẫn và template
+├── deploy/linux/            Docker Compose, Caddy và script chạy trên Linux host
 ├── scripts/                 Script verify, smoke test và security scan
 ├── src/                     Source code ứng dụng
 ├── tests/                   Các project kiểm thử
@@ -333,8 +334,9 @@ Các script chỉ chạy khi được gọi thủ công hoặc từ CI; chúng k
 - [`.github/pull_request_template.md`](../.github/pull_request_template.md): mẫu ghi vấn đề, thay đổi, kiểm thử và
   ảnh hưởng cấu hình/tài liệu trong pull request.
 
-Repository chưa khởi tạo Git hoặc kết nối source hosting. Vì vậy `.github/` là cấu hình chuẩn bị sẵn, chưa phải
-bằng chứng workflow hoặc Dependabot đã chạy trên GitHub.
+Repository được lưu tại [`dat23052004/stm-be`](https://github.com/dat23052004/stm-be). Workflow `build-test` và
+Dependabot đang hoạt động trên GitHub. CI publish image lên GHCR; CD Linux có staging/production, health check và
+rollback nhưng mặc định bị skip cho tới khi các GitHub Environment variables/secrets được điền.
 
 ## 11. Cách thêm một feature
 

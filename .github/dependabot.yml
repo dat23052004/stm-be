@@ -16,5 +16,7 @@ updates:
     schedule:
       interval: weekly
     ignore:
-      - dependency-name: mcr.microsoft.com/dotnet/*
+      - dependency-name: dotnet/sdk
+        update-types: [version-update:semver-major]
+      - dependency-name: dotnet/aspnet
         update-types: [version-update:semver-major]

@@ -1,0 +1,21 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$PRODUCTION_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy api-production:8080 {
+        health_uri /health/ready
+        health_interval 30s
+        health_timeout 5s
+    }
+}
+
+{$STAGING_DOMAIN} {
+    encode zstd gzip
+    reverse_proxy api-staging:8080 {
+        health_uri /health/ready
+        health_interval 30s
+        health_timeout 5s
+    }
+}

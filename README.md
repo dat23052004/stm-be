@@ -74,13 +74,23 @@ docker compose up --build
 Docker dùng cổng `8080` và môi trường Production mặc định; xem `/health`. Đây là container API,
 chưa kèm database. Hạ container bằng `docker compose down` khi dùng xong.
 
+## Triển khai Linux
+
+CI publish image đã kiểm tra lên `ghcr.io/dat23052004/stm-be` bằng tag commit SHA và tag branch. Bộ CD Linux dùng
+Docker Compose, Caddy HTTPS, hai slot staging/production và SSH deployment có kiểm tra health/rollback.
+Deploy tự động mặc định tắt cho tới khi điền GitHub Environments và server config; xem
+[hướng dẫn triển khai Linux](docs/guides/linux-deployment.md).
+
 ## Phạm vi hiện tại
 
-Đã có solution, HTTP pipeline nền, cấu hình môi trường, ba project test trống, CI, Docker và bộ agent/tài liệu.
+Đã có solution, HTTP pipeline nền, cấu hình môi trường, ba project test trống, CI, Docker, GHCR/CD scaffold
+cho Linux và bộ agent/tài liệu.
 Chưa có use case nghiệp vụ hoặc test case; source đang ở trạng thái base để bắt đầu phát triển tính năng thật.
 Chưa chọn database, authentication/authorization, storage/email, frontend hoặc mô hình nghiệp vụ LabX.
-Giữ .NET 9 theo yêu cầu; chưa khởi tạo Git hoặc kết nối source hosting.
-Workflow CI và Dependabot là cấu hình chuẩn bị sẵn, chưa phải bằng chứng đã chạy trên GitHub.
+Giữ .NET 9 theo yêu cầu. Repository được lưu tại
+[`dat23052004/stm-be`](https://github.com/dat23052004/stm-be); workflow `build-test` chạy khi push vào
+`main`/`develop`, khi mở pull request hoặc khi chạy thủ công. Dependabot theo dõi NuGet, Docker và GitHub Actions;
+các bản nâng major của .NET SDK/runtime bị bỏ qua để không tự chuyển dự án sang .NET 10.
 Các quyết định này được theo dõi trong [project context](docs/project-context.md); không sao chép nghiệp vụ AuLac.
 
 Xem [kiến trúc](docs/architecture.md), [chiến lược test](docs/testing/strategy.md) và

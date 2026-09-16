@@ -1,0 +1,51 @@
+services:
+  api-production:
+    image: ${PRODUCTION_IMAGE_REF:?Set PRODUCTION_IMAGE_REF in deploy.env}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      AllowedHosts: ${PRODUCTION_DOMAIN:?Set PRODUCTION_DOMAIN in deploy.env}
+      Cors__AllowedOrigins__0: ${PRODUCTION_CORS_ORIGIN:?Set PRODUCTION_CORS_ORIGIN in deploy.env}
+    expose:
+      - "8080"
+    networks:
+      - edge
+
+  api-staging:
+    image: ${STAGING_IMAGE_REF:?Set STAGING_IMAGE_REF in deploy.env}
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Staging
+      ASPNETCORE_HTTP_PORTS: "8080"
+      AllowedHosts: ${STAGING_DOMAIN:?Set STAGING_DOMAIN in deploy.env}
+      Cors__AllowedOrigins__0: ${STAGING_CORS_ORIGIN:?Set STAGING_CORS_ORIGIN in deploy.env}
+    expose:
+      - "8080"
+    networks:
+      - edge
+
+  caddy:
+    image: caddy:2.11.4-alpine
+    restart: unless-stopped
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in deploy.env}
+      PRODUCTION_DOMAIN: ${PRODUCTION_DOMAIN:?Set PRODUCTION_DOMAIN in deploy.env}
+      STAGING_DOMAIN: ${STAGING_DOMAIN:?Set STAGING_DOMAIN in deploy.env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+
+networks:
+  edge:
+
+volumes:
+  caddy_data:
+  caddy_config:

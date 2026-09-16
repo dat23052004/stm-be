@@ -51,13 +51,20 @@ Không dùng `-UpdateLockFile` trong CI; sai khác dependency phải được ph
 Giữ target .NET 9 theo yêu cầu; không tự nâng major. Kiểm tra lịch hỗ trợ và bản vá định kỳ tại
 [chính sách .NET](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core).
 
-## CI chuẩn bị sẵn
+## CI trên GitHub
 
 `.github/workflows/build-test.yml` chạy cùng các script bằng PowerShell 7 trên Ubuntu, build image,
 quét repository/image và upload bằng chứng. Actions ghim bằng commit SHA;
 `.github/dependabot.yml` chuẩn bị cập nhật NuGet, Docker và Actions hàng tuần.
 SDK trong global.json và phiên bản Trivy vẫn cần cập nhật có kiểm soát.
-Chưa khởi tạo Git/remote hoặc chạy workflow trên GitHub theo yêu cầu hiện tại.
+Workflow đang hoạt động tại [GitHub Actions](https://github.com/dat23052004/stm-be/actions) và được kích hoạt bởi
+pull request, push vào `main`/`develop` hoặc `workflow_dispatch`. Dependabot bỏ qua bản nâng major của Docker image
+.NET để giữ target .NET 9. Mỗi pull request cập nhật vẫn phải được review; CI pass không tự động cho phép merge.
+
+Sau khi CI pass trên `main` hoặc `develop`, workflow publish image theo commit SHA và tag branch lên GHCR. Các job
+deploy Linux chỉ chạy khi repository variable của môi trường bằng `true`; khi chưa điền host/domain/secrets chúng
+bị skip và không làm CI thất bại. Xem [hướng dẫn Linux](linux-deployment.md) để cấu hình GitHub Environments,
+automatic deployment, health check và rollback.
 
 ## Runtime image
 

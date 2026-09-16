@@ -13,3 +13,4 @@ artifacts/
 *.log
 *.trx
 coverage/
+deploy/linux/deploy.env

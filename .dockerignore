@@ -9,3 +9,4 @@ artifacts
 TestResults
 *.user
 .nuget
+deploy/linux/deploy.env
