@@ -28,6 +28,19 @@ jobs:
         with:
           version: v0.74.0
           cache: false
+      - name: Validate Linux deployment bundle
+        run: |
+          docker compose \
+            --env-file deploy/linux/deploy.env.example \
+            --file deploy/linux/compose.yml \
+            config --quiet
+          docker run --rm \
+            --env ACME_EMAIL=admin@example.com \
+            --env PRODUCTION_DOMAIN=api.example.com \
+            --env STAGING_DOMAIN=staging-api.example.com \
+            --volume "$PWD/deploy/linux/Caddyfile:/etc/caddy/Caddyfile:ro" \
+            caddy:2.11.4-alpine@sha256:5f5c8640aae01df9654968d946d8f1a56c497f1dd5c5cda4cf95ab7c14d58648 \
+            caddy validate --config /etc/caddy/Caddyfile
       - name: Build runtime image
         run: docker build -t backend-api:ci .
       - name: Smoke test runtime image

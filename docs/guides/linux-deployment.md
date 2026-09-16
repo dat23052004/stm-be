@@ -16,7 +16,8 @@ push / pull request
 
 Một VPS chạy hai API container tách biệt và một Caddy container dùng chung. Chỉ Caddy mở cổng 80/443;
 API chỉ nằm trong Docker network. Caddy cấp HTTPS và chuyển request theo domain. Image triển khai dùng tag commit
-SHA để có thể chạy lại workflow thủ công với image cũ khi cần rollback.
+SHA để có thể chạy lại workflow thủ công với image cũ khi cần rollback. Caddy được ghim theo version và digest;
+CI render Compose và chạy `caddy validate` trước khi publish application image.
 
 ## Điều kiện trên Linux host
 
