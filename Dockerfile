@@ -9,7 +9,7 @@ RUN dotnet restore src/Api/Api.csproj --locked-mode
 COPY src/ src/
 RUN dotnet publish src/Api/Api.csproj -c Release --no-restore -o /app/publish /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0.20-noble-chiseled-extra@sha256:c7c53c7bb1e5bdcf216677c6b8e97cda49f4f3351b3c870556024bb800450ddd AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0.22-noble-chiseled-extra@sha256:a606a886dc72bf03ab16b0484e9655457b1ae5836c5995ceeb42399e6a592a43 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_HTTP_PORTS=8080
