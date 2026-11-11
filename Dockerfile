@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0.318@sha256:20387c6674c30e46def0cc8cb557bd2a69b35afdf18c19c3694638d0a90897e4 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0.321@sha256:1dfdb27e9c2c345cb598925ccf6b13719ecfebea8467bd4745c23a3c108cdf84 AS build
 WORKDIR /source
 COPY global.json Directory.Build.props Directory.Packages.props NuGet.Config ./
 COPY src/Api/Api.csproj src/Api/packages.lock.json src/Api/
